@@ -1,0 +1,34 @@
+/* 全局样式:基础 reset + 响应式细节 */
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+               "Segoe UI", Roboto, sans-serif;
+  background: #f5f7fa;
+  color: #303133;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* 通用页面容器:左右内边距,大屏居中 */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* 列表卡片悬浮效果 */
+.doc-card {
+  cursor: pointer;
+  transition: box-shadow .2s, transform .2s;
+}
+.doc-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+
+/* 移动端微调 */
+@media (max-width: 768px) {
+  .page-container { padding: 8px; }
+  .hide-on-mobile { display: none !important; }
+}

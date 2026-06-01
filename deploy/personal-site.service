@@ -1,0 +1,25 @@
+[Unit]
+Description=Personal Site Flask App (8080)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www
+Group=www
+WorkingDirectory=/opt/personal-site/backend
+EnvironmentFile=/opt/personal-site/backend/.env
+ExecStart=/opt/personal-site/backend/.venv/bin/gunicorn \
+    --workers 2 \
+    --threads 4 \
+    --bind 0.0.0.0:8080 \
+    --access-logfile /var/log/personal-site/access.log \
+    --error-logfile /var/log/personal-site/error.log \
+    app:app
+Restart=always
+RestartSec=3
+StandardOutput=append:/var/log/personal-site/stdout.log
+StandardError=append:/var/log/personal-site/stderr.log
+
+[Install]
+WantedBy=multi-user.target

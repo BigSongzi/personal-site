@@ -1,0 +1,22 @@
+# 可选 Nginx 反代配置(若希望走 80/443):
+# 1) 把本文件 cp 到 /etc/nginx/conf.d/personal-site.conf
+# 2) 修改 server_name / SSL 证书路径
+# 3) systemctl reload nginx
+# 4) 阿里云安全组放行 80/443
+server {
+    listen 80;
+    server_name 123.57.110.129;
+
+    client_max_body_size 10m;
+
+    location / {
+        proxy_pass         http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+
+# 如配置了 SSL 证书,可加 443 server 块,把上面 location 复制进来即可。

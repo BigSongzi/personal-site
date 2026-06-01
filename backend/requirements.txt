@@ -1,0 +1,9 @@
+# 后端依赖清单
+Flask==3.0.3                 # Web 框架
+Flask-Cors==4.0.1            # 跨域(开发期前端 dev server 使用)
+PyJWT==2.9.0                 # JWT 鉴权
+Werkzeug==3.0.4              # 密码哈希 / 文件名处理
+APScheduler==3.10.4          # 定时任务(金价拉取)
+requests==2.32.3             # 调用京东金融 API
+python-dotenv==1.0.1         # 加载 .env
+gunicorn==22.0.0             # 生产 WSGI 服务器

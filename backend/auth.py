@@ -6,6 +6,7 @@ JWT 鉴权工具。
 """
 from datetime import datetime, timedelta, timezone
 from functools import wraps
+from typing import Optional
 
 import jwt
 from flask import request, jsonify, g
@@ -25,7 +26,7 @@ def create_token(user_id: int, username: str) -> str:
     return jwt.encode(payload, config.JWT_SECRET, algorithm=config.JWT_ALG)
 
 
-def decode_token(token: str) -> dict | None:
+def decode_token(token: str) -> Optional[dict]:
     """解析 JWT,失败返回 None(包括过期、签名错误等)。"""
     try:
         return jwt.decode(token, config.JWT_SECRET, algorithms=[config.JWT_ALG])

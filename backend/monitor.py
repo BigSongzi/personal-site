@@ -8,6 +8,7 @@
 import logging
 import sys
 import time
+from typing import Tuple
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, jsonify
@@ -26,7 +27,7 @@ log = logging.getLogger("monitor")
 scheduler = BackgroundScheduler(timezone="Asia/Shanghai")
 
 
-def _read_config() -> tuple[int, str, bool]:
+def _read_config() -> Tuple[int, str, bool]:
     """从 SQLite 读取最新配置(interval_sec, product_code, enabled)。"""
     with standalone_conn() as c:
         row = c.execute("SELECT * FROM gold_config WHERE id=1").fetchone()

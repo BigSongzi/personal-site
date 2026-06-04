@@ -25,6 +25,7 @@
 import json
 import logging
 from datetime import datetime
+from typing import Optional
 
 import requests
 
@@ -45,7 +46,7 @@ _HEADERS = {
 }
 
 
-def fetch_jd_gold(product_code: str | None = None, timeout: int = 8) -> dict:
+def fetch_jd_gold(product_code: Optional[str] = None, timeout: int = 8) -> dict:
     """
     调用京东金融返回原始 dict;失败抛 RuntimeError。
     """
@@ -67,7 +68,7 @@ def fetch_jd_gold(product_code: str | None = None, timeout: int = 8) -> dict:
     }
 
 
-def fetch_and_save(product_code: str | None = None) -> dict:
+def fetch_and_save(product_code: Optional[str] = None) -> dict:
     """
     拉取 + 写入 gold_price 表,返回最新插入信息。
     供监控进程定时调用 / 接口手动调用复用。

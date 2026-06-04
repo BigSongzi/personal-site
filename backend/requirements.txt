@@ -1,9 +1,12 @@
-# 后端依赖清单
-Flask==3.0.3                 # Web 框架
-Flask-Cors==4.0.1            # 跨域(开发期前端 dev server 使用)
-PyJWT==2.9.0                 # JWT 鉴权
-Werkzeug==3.0.4              # 密码哈希 / 文件名处理
-APScheduler==3.10.4          # 定时任务(金价拉取)
-requests==2.32.3             # 调用京东金融 API
-python-dotenv==1.0.1         # 加载 .env
-gunicorn==22.0.0             # 生产 WSGI 服务器
+# 后端依赖清单(Python 3.6+ 兼容版本组合,适配阿里云 Linux 2 默认 Python 3.6.8)
+Flask==2.0.3                 # Web 框架
+Flask-Cors==3.0.10           # 跨域(开发期前端 dev server 使用)
+PyJWT==2.4.0                 # JWT 鉴权
+Werkzeug==2.0.3              # 密码哈希 / 文件名处理(必须 < 2.1,否则破坏 Flask 2.0 兼容)
+Jinja2==3.0.3                # Flask 2.0.3 配套版本
+itsdangerous==2.0.1          # Flask 2.0.3 配套版本
+click==8.0.4                 # Flask 2.0.3 配套版本(>=8.1 不兼容 py3.6)
+APScheduler==3.9.1           # 定时任务(金价拉取)
+requests==2.27.1             # 调用京东金融 API(2.28+ 已不再支持 py3.6)
+python-dotenv==0.20.0        # 加载 .env
+gunicorn==20.1.0             # 生产 WSGI 服务器

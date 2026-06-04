@@ -2,25 +2,28 @@
 京东金融金价 API 封装。
 公开接口示例(无需鉴权):
     GET https://ms.jr.jd.com/gw/generic/hj/h5/m/latestPrice
-返回结构(简化):
+真实返回结构(2026 年验证):
     {
       "resultCode": 0,
       "resultData": {
         "datas": {
-          "Au99.99": {
-            "productSku": "Au99.99",
-            "price": "612.55",
-            "demode": "0.55",
-            "yesterdayPrice": "612.00",
-            "time": "2026-06-01 10:30:00",
-            ...
-          },
-          "Au100g": { ... },
-          ...
-        }
-      }
+          "productSku": "P005",
+          "price": "974.87",
+          "yesterdayPrice": "970.68",
+          "upAndDownAmt": "+4.19",
+          "upAndDownRate": "+0.43%",
+          "demode": false,
+          "id": 82274768,
+          "time": "1780545279000"   # 毫秒时间戳
+        },
+        "status": "SUCCESS"
+      },
+      "success": true,
+      ...
     }
-本模块只关心 config.GOLD_PRODUCT_CODE 这一只品类。
+该接口直接返回当前主推黄金现货(Au99.99 对应 SKU=P005),不支持多品类筛选。
+本模块按"配置 product_code 仅作为显示标签"处理,实际写入数据库的 product_code
+取 API 返回的 productSku,价格取 price(元/克)。
 """
 import json
 import logging
@@ -46,25 +49,40 @@ _HEADERS = {
 }
 
 
+def _format_ts(ms_or_str) -> str:
+    """京东 time 字段为 ms 时间戳字符串,这里转 'YYYY-MM-DD HH:MM:SS'。"""
+    if ms_or_str is None or ms_or_str == "":
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        ms = int(ms_or_str)
+        return datetime.fromtimestamp(ms / 1000).strftime("%Y-%m-%d %H:%M:%S")
+    except (TypeError, ValueError):
+        # 已经是字符串日期则原样返回
+        return str(ms_or_str)
+
+
 def fetch_jd_gold(product_code: Optional[str] = None, timeout: int = 8) -> dict:
     """
-    调用京东金融返回原始 dict;失败抛 RuntimeError。
+    调用京东金融返回标准化 dict;失败抛 RuntimeError。
+    返回:
+      { product_code, price(float), raw(dict), ts(str) }
     """
-    code = product_code or config.GOLD_PRODUCT_CODE
+    label = product_code or config.GOLD_PRODUCT_CODE   # 显示用标签
     resp = requests.get(config.JD_GOLD_API, headers=_HEADERS, timeout=timeout)
     resp.raise_for_status()
     payload = resp.json()
     if str(payload.get("resultCode")) != "0":
         raise RuntimeError(f"京东返回非 0: {payload.get('resultMsg')}")
-    datas = (payload.get("resultData") or {}).get("datas") or {}
-    one = datas.get(code)
-    if not one or "price" not in one:
-        raise RuntimeError(f"未在返回中找到 {code},现有: {list(datas.keys())[:5]}")
+    data = (payload.get("resultData") or {}).get("datas") or {}
+    if "price" not in data:
+        raise RuntimeError(f"返回结构异常,缺少 price 字段: keys={list(data.keys())[:8]}")
+    sku = data.get("productSku") or label
     return {
-        "product_code": code,
-        "price": float(one["price"]),
-        "raw": one,
-        "ts": one.get("time") or datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "product_code": label or sku,    # 优先用用户配置的标签
+        "sku": sku,                      # 实际 SKU(P005 等)
+        "price": float(data["price"]),
+        "raw": data,
+        "ts": _format_ts(data.get("time")),
     }
 
 
